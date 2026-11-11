@@ -5,3 +5,6 @@ dist/
 build/module.bin
 build/module.elf
 build/module.map
+tests/fixtures/
+T8L_Bench_Report*.json
+build/bench-replay.json

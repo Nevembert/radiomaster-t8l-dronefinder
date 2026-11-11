@@ -1,0 +1,43 @@
+{
+  "version": "1.0",
+  "candidate_sha256": "7487229fd06aa87484c529ee938b3c2111ff8a9ca9b7af36e5073575a3ce88e6",
+  "scope": "Own native logic, own ARM instructions with six stock mocks, static official-image inspection. Native queue/PWM/IRQs not executed.",
+  "results": [
+    {
+      "suite": "tests/run_tests.py",
+      "exit_code": 0,
+      "checks": "Seven native ASan/UBSan suites, two analyzer checks. Audio cadence bounds/monotonicity/wrap/disable, no-link silence, context gates, stock busy priority, bounded heap checks."
+    },
+    {
+      "suite": "tests/test_arm_module.py",
+      "exit_code": 0,
+      "checks": "Eight ARM/Thumb scenarios; six stock mocks; registers, SP, PRIMASK and write-boundary guards. Cadence, stale link, exit, busy queue and malformed/depleted heap.",
+      "max_observed_own_stack_bytes": 144
+    },
+    {
+      "suite": "tests/test_candidate.py",
+      "exit_code": 0,
+      "checks": "Nine static cases: hash/vectors/bounds/22 patches/independent BL decode, original-image requirement, native short-tone queue calls unchanged."
+    },
+    {
+      "suite": "tests/test_bench.cjs + tests/test_bench_ui.cjs",
+      "exit_code": 0,
+      "checks": "Framing, CRC, signed RSSI, bounded memory, connect/export/stale/disconnect behavior using synthetic DOM and serial."
+    }
+  ],
+  "previous_user_evidence": {
+    "version": "0.6",
+    "reported": "User reports successful installation. User demonstrated loader UART 0x43 and exit back to normal operation. No independent recovery test with broken application."
+  },
+  "not_tested": [
+    "Physical 1.0 beep cadence/duration/volume",
+    "Native audio queue and allocator under real IRQ timing",
+    "Full original plus module execution",
+    "Independent recovery after application startup failure",
+    "Flight safety and complete channel/failsafe behavior"
+  ],
+  "unchanged_diagnostics": "Bench UI/parser checked again for 1.0 using synthetic data. Private telemetry recordings are excluded from the public release.",
+  "release_tag": "v1.0.0",
+  "packaging": "Renamed from 0.7; firmware bytes unchanged.",
+  "release_verification": "Version 1.0 rebuilt; identical SHA-256 to audio build 0.7. All listed suites re-run successfully."
+}

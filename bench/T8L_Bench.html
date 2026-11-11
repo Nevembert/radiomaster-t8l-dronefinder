@@ -1,0 +1,92 @@
+<!doctype html><html lang="ru"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>T8L — проверка телеметрии</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,sans-serif;background:#101820;color:#eaf2f7}
+body{max-width:960px;margin:auto;padding:32px 20px}h1{font-size:32px;margin:8px 0}h2{font-size:19px}p{line-height:1.55;color:#b8cbd7}
+.tag{color:#58d9b3;font-size:13px;letter-spacing:.12em;text-transform:uppercase}.panel{background:#192731;border:1px solid #31444f;border-radius:14px;padding:22px;margin:18px 0}.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}button,select{font:inherit;border:1px solid #49616d;border-radius:8px;padding:11px 14px;background:#263b48;color:inherit}button{cursor:pointer}button.primary{background:#48ceac;color:#092c24;border:0;font-weight:650}button:disabled{opacity:.45;cursor:default}.readout{display:grid;grid-template-columns:1fr 1fr;gap:24px}.number{font-size:48px;font-weight:700;font-variant-numeric:tabular-nums}.leds{display:flex;gap:10px;margin:20px 0}.led{height:22px;flex:1;border-radius:6px;background:#30414a}.led.on{background:#58d9b3;box-shadow:0 0 16px #58d9b344}.notice{border-left:3px solid #e9b257;padding-left:14px}#message{min-height:28px;color:#e9b257}small{color:#9eb5c2}ol{line-height:1.7;padding-left:23px}canvas{width:100%;height:130px}details{margin-top:16px}code{color:#82d8ff}@media(max-width:580px){.readout{grid-template-columns:1fr}.number{font-size:40px}}
+</style>
+<div class="tag">Drone Finder · стенд 1.0</div>
+<h1>Проверка связи с T8L</h1>
+<p>Работает с заводской прошивкой Controller v1.7. Запрашивает только состояние связи. Настройки, привязку и прошивку не меняет. Физическими светодиодами эта страница не управляет.</p>
+<p class="notice">Первый тест — без пропеллеров, ARM выключен. Не оставляй видеопередатчик дрона надолго без охлаждения. Не включай поиск в полёте.</p>
+<section class="panel"><h2>1. Подключение</h2>
+<ol><li>На выключенном пульте удерживай M и включи питание — режим USB-конфигуратора.</li><li>Подключи USB-кабель. Закрой официальный конфигуратор, чтобы освободить порт.</li><li>Открой эту страницу в Chrome или Edge на компьютере и выбери порт RadioMaster T8L.</li></ol>
+<div class="controls"><label>Скорость <select id="baud"><option selected>420000</option><option>115200</option><option>460800</option></select></label><button id="connect" class="primary">Подключить T8L</button><button id="disconnect" disabled>Отключить</button></div>
+<p id="message" role="status" aria-live="polite">Пульт не подключён.</p><small>Если порт не открывается, закрой другие программы с этим портом. Если нет ответов, отключись и попробуй следующую скорость. Если дрон ещё не связан с T8L, этот тест сам привязку не создаст.</small></section>
+<section class="panel"><div class="readout"><div><small>RSSI из USB-снимка</small><div class="number" id="rssi">— dBm</div><div class="leds" aria-label="Предварительная шкала"><i class="led"></i><i class="led"></i><i class="led"></i><i class="led"></i></div></div><div><p id="state">Нет пакетов</p><p id="counts">Принято: 0</p><small>Значения могут повторяться и искусственно стареть в штатной прошивке. Это диагностика данных, не измерение расстояния и не доказательство свежести радиопакета.</small></div></div><canvas id="plot" width="900" height="130" aria-label="График RSSI"></canvas></section>
+<section class="panel"><h2>2. Запись короткого теста</h2><p>Выбирай этап перед действием. На каждом этапе запиши 10–15 секунд. Приёмник должен быть уже связан с этим пультом.</p>
+<div class="controls"><label>Этап <select id="phase" disabled><option value="off_before">Дрон выключен</option><option value="near">Дрон включён, 1–2 м</option><option value="farther">Дрон дальше, в безопасном месте</option><option value="off_after">Дрон снова выключен</option></select></label><button id="save" disabled>Скачать отчёт JSON</button></div><p>Для последнего этапа отключи питание дрона и подожди 15 секунд. Сохрани отчёт и отправь его в чат. Счётчик переданных команд в отчёте содержит только запросы состояния <code>A5 55 26 0D 0A</code>.</p></section>
+<details><summary>Что эта проверка не подтверждает</summary><p>Она не проверяет загрузчик и восстановление пульта, физический порядок LED, кнопку M в новой прошивке или наличие свободной памяти. Сборка BIN 0.5 ещё не допущена к установке. Встроенного прошивальщика здесь нет.</p></details>
+<script src="telemetry.js"></script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+let port=null,reader=null,writer=null,loop=null,timer=null,busy=false,stopping=false;
+let session=null,stream=null,last=null,records=[],changes=[],transport=[],dropped=0,transmitted=0;
+const MAX_RECORDS=2400;
+function mark(text){$('message').textContent=text;}
+function elapsed(){return Math.round(performance.now()-session.start);}
+function recording(){return !!(port && reader && writer && !stopping && last && elapsed()-last.timeMs<=2500);}
+function event(kind,detail=''){if(session)transport.push({timeMs:elapsed(),kind,detail});}
+function received(f){
+  f.phase=$('phase').value; last=f;
+  if(records.length>=MAX_RECORDS){records.shift();dropped++;}
+  records.push(f); $('save').disabled=false; render();
+}
+function render(){
+  const stale=!session || !last || elapsed()-last.timeMs>2500;
+  $('phase').disabled=!recording();
+  $('rssi').textContent=(!stale && last.rssiDbm!==null?last.rssiDbm:'—')+' dBm';
+  $('state').textContent=stale?'Нет свежего USB-ответа':last.connectFlag===1?'Пульт сообщает о связи':'Пульт не подтверждает связь';
+  $('counts').textContent=`Принято пакетов: ${records.length+dropped} · ошибок CRC: ${stream?stream.badCrc:0}`;
+  document.querySelectorAll('.led').forEach((el,i)=>el.classList.toggle('on',!stale && i<last.bars));
+  const canvas=$('plot'),ctx=canvas.getContext('2d'); ctx.clearRect(0,0,900,130);
+  ctx.strokeStyle='#31444f';ctx.beginPath();[20,65,110].forEach(y=>{ctx.moveTo(0,y);ctx.lineTo(900,y);});ctx.stroke();
+  ctx.strokeStyle='#58d9b3';ctx.lineWidth=2;ctx.beginPath();let pen=false;
+  records.slice(-120).forEach((f,i)=>{if(f.rssiDbm===null||f.connectFlag!==1){pen=false;return;}const x=i*900/119,y=120-(f.rssiDbm+127)*110/127;if(pen)ctx.lineTo(x,y);else ctx.moveTo(x,y);pen=true;});ctx.stroke();
+}
+async function query(){
+  if(!writer || busy || stopping)return;
+  busy=true;
+  try{await writer.write(Uint8Array.from(LINK_QUERY));transmitted++;}
+  catch(e){event('write_error',e.message);mark('Ошибка запроса: '+e.message);clearInterval(timer);timer=null;}
+  finally{busy=false;}
+}
+async function disconnect(){
+  if(stopping)return; event('disconnect_requested');stopping=true; clearInterval(timer);timer=null;$('phase').disabled=true;
+  try{if(reader)await reader.cancel();if(loop)await loop;}
+  catch(e){mark('Чтение остановлено: '+e.message);}
+  try{if(writer){await writer.close();writer.releaseLock();writer=null;}if(port)await port.close();}
+  catch(e){mark('Закрытие порта: '+e.message);}
+  finally{event('disconnected');port=null;loop=null;reader=null;stopping=false;$('connect').disabled=false;$('disconnect').disabled=true;$('baud').disabled=false;last=null;render();}
+}
+$('connect').onclick=async()=>{
+  if(!navigator.serial){mark('Нужен Chrome/Edge на компьютере с Web Serial.');return;}
+  $('connect').disabled=true;
+  try{
+    port=await navigator.serial.requestPort();await port.open({baudRate:Number($('baud').value)});
+    writer=port.writable.getWriter();reader=port.readable.getReader();
+    session={start:performance.now(),startedAt:new Date().toISOString(),baud:Number($('baud').value),port:port.getInfo()};
+    records=[];transport=[];event('connected');changes=[{timeMs:0,phase:$('phase').value}];last=null;dropped=transmitted=0;
+    stream=new LinkStream(received);$('save').disabled=false;$('disconnect').disabled=false;$('baud').disabled=true;
+    loop=(async()=>{try{while(true){const {value,done}=await reader.read();if(done){event('read_end');break;}if(value)stream.feed(value,elapsed());}}
+      catch(e){event('read_error',e.message);mark('Порт отключён или чтение прервано: '+e.message);clearInterval(timer);timer=null;}
+      finally{reader.releaseLock();reader=null;}})();
+    timer=setInterval(query,500);await query();mark('Подключено. Отметь этап и запиши тест. Новое подключение начинает новый отчёт.');
+  }catch(e){mark('Не удалось подключиться: '+e.message);await disconnect();}
+};
+$('disconnect').onclick=async()=>{await disconnect();mark('Отключено. Отчёт можно сохранить.');};
+$('phase').onchange=()=>{if(recording())changes.push({timeMs:elapsed(),phase:$('phase').value});else mark('Этап не записан: нет активного приёма данных. Переподключи пульт.');};
+$('save').onclick=()=>{
+  if(!session)return;
+  const data={format:'t8l-bench-0.6',startedAt:session.startedAt,baud:session.baud,port:session.port,
+    savedAtMs:elapsed(),lastFrameMs:records.length?records[records.length-1].timeMs:null,recording:recording(),transport,
+    query:LINK_QUERY,transmitted,receivedBytes:stream.bytes,badCrc:stream.badCrc,droppedOldRecords:dropped,
+    limitation:'USB snapshots, not direct RF samples. No firmware or settings writes.',phases:changes,records};
+  const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+  const a=document.createElement('a');a.href=url;a.download='T8L_Bench_Report.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+setInterval(render,250);
+</script></html>

@@ -1,0 +1,57 @@
+name: Publish DroneFinder 1.0
+
+on:
+  push:
+    branches: [main]
+    paths: [VERSION]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dronefinder-release-1.0
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Verify release files and package
+        run: python3 tools/package_release.py
+      - name: Native logic and static base-image checks
+        run: python3 tests/run_tests.py --firmware recovery/T8L-V1_7updata.bin
+      - name: Telemetry parser and diagnostic interface
+        run: |
+          node tests/test_bench.cjs
+          node tests/test_bench_ui.cjs
+
+  release:
+    needs: verify
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - run: python3 tools/package_release.py
+      - name: Publish immutable version 1.0 assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: |
+          gh release create v1.0.0 \
+            dist/T8L_v17_DroneFinder_1.0.bin \
+            dist/T8L_DroneFinder_1.0.zip \
+            dist/SHA256SUMS.txt \
+            --target "$RELEASE_COMMIT" \
+            --title 'RadioMaster T8L DroneFinder 1.0' \
+            --notes-file RELEASE_NOTES.md

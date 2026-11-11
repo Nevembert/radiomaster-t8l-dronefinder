@@ -1,0 +1,147 @@
+{
+  "status": "static-analysis-only; not an installable modification",
+  "sha256": "91c69ad34105bd12dc167f29cca538f84c474e18ec36902ce503b578ce03a958",
+  "size": 94536,
+  "base": "0x8006000",
+  "msp": "0x20004538",
+  "reset": "0x800615d",
+  "initialized_data_size": 1200,
+  "compressed_data_end": "0x801d142",
+  "initialized_data_sha256": "ad078f0450ef031135c6eb33960dcd753d50da415cc65aa4c4072132d104f866",
+  "led_pins_in_logical_order": [
+    "PB5",
+    "PB4",
+    "PB3",
+    "PA15",
+    "PD15",
+    "PD14"
+  ],
+  "led_states_address": "0x20001008",
+  "link_stats_address": "0x20000dbd",
+  "downlink_rssi_address": "0x20000dc4",
+  "link_stats_age_counter": "0x20000b2c",
+  "timebase": {
+    "nominal_ticks_per_second": 4000,
+    "counter": "0x20000e1c",
+    "systick_vector": "0x800b821",
+    "note": "static configuration; oscillator timing not measured"
+  },
+  "keys": {
+    "m": {
+      "index": 1,
+      "raw_address": "0x20001b01",
+      "pin": "PA5",
+      "active_low": true
+    },
+    "power": {
+      "index": 0,
+      "raw_address": "0x2000065e",
+      "pin": "PC15",
+      "active_low": true
+    },
+    "event_array": "0x2000066d",
+    "double_event": 255,
+    "stock_handler": "0x08011d20",
+    "candidate_call_hook": "0x08014ba4",
+    "note": "inferred from input tables and bind-handler control flow"
+  },
+  "settings_flash_write_base": "0x0801f800",
+  "calibration_flash_write_base": "0x0801f000",
+  "heap": {
+    "start": "0x20001b3c",
+    "end": "0x20003038",
+    "end_literal": "0x0801ba8c",
+    "note": "end reservation requires patching literal; headroom not measured"
+  },
+  "evidence": {
+    "led_apply": {
+      "address": "0x800f994",
+      "bytes": "80 b5 84 b0 03 90 00 20 8d f8 0b 00 ff e7 9d f8 0b 00 40 f2 30 31 c2 f2"
+    },
+    "digital_write": {
+      "address": "0x801076c",
+      "bytes": "80 b5 86 b0 13 46 8c 46 86 46 8d f8 16 00 8d f8 15 10 8d f8 14 20 00 20"
+    },
+    "battery_render_call": {
+      "address": "0x8016824",
+      "bytes": "fd f7 5a fa"
+    },
+    "link_stats_parse": {
+      "address": "0x8018b18",
+      "bytes": "14 98 c0 78 40 f6 bd 51 c2 f2 00 01 08 70 14 98"
+    },
+    "downlink_rssi_store": {
+      "address": "0x8018b6a",
+      "bytes": "14 98 80 7a c8 71"
+    },
+    "link_stats_event_return": {
+      "address": "0x8018b96",
+      "bytes": "0d 20 8d f8 4e 00"
+    },
+    "stale_rssi_decrement": {
+      "address": "0x801ab60",
+      "bytes": "40 f6 bd 50 c2 f2 00 00 c1 79 01 39 c1 71"
+    },
+    "link_stats_age_reset": {
+      "address": "0x80155ae",
+      "bytes": "40 f6 2c 30 c2 f2 00 00 00 21 01 80"
+    },
+    "timer_calls_led_scheduler": {
+      "address": "0x800b95c",
+      "bytes": "0e f0 d4 fe"
+    },
+    "systick_reload_divide_4000": {
+      "address": "0x800b7e8",
+      "bytes": "40 f2 14 10 c2 f2 00 00 00 68 44 f6 d3 51 c1 f2 62 01 a0 fb 01 01 09 0a 01 90 08 46 ff f7 c4 ff"
+    },
+    "systick_counter_increment": {
+      "address": "0x800b82e",
+      "bytes": "40 f6 1c 60 c2 f2 00 00 01 68 01 31 01 60"
+    },
+    "gpio_input_scan": {
+      "address": "0x8019562",
+      "bytes": "41 f6 fa 20 c2 f2 00 00 40 f2 80 41 c2 f2 00 01 fa f7 bd f9"
+    },
+    "key_scan_call": {
+      "address": "0x8014b92",
+      "bytes": "02 f0 df fd"
+    },
+    "stock_key_handler_call": {
+      "address": "0x8014ba4",
+      "bytes": "fd f7 bc f8"
+    },
+    "scanner_double_event": {
+      "address": "0x8017b48",
+      "bytes": "04 98 02 9a ff 23 83 54"
+    },
+    "stock_m_hold_compare": {
+      "address": "0x801210a",
+      "bytes": "2c 98 40 78 07 28 1c db"
+    },
+    "settings_flash_write": {
+      "address": "0x801a514",
+      "bytes": "4f f6 00 01 c0 f6 01 01 01 eb 80 01 06 9a 52 f8 20 00 01 90 08 46 01 99 f7 f7 6c f9"
+    },
+    "calibration_flash_write": {
+      "address": "0x801a480",
+      "bytes": "4f f2 00 01 c0 f6 01 01 01 eb 80 01 04 9a 52 f8 20 00 00 90 08 46 00 99 f7 f7 b6 f9"
+    },
+    "heap_lazy_initialize": {
+      "address": "0x801ba68",
+      "bytes": "06 4a 07 48 10 60 07 4a 12 1a 22 f0 07 02 c0 e9 00 24 01 20 28 60 d7 e7"
+    },
+    "returning_loop_iteration": {
+      "address": "0x801725e",
+      "bytes": "fd f7 23 fc"
+    }
+  },
+  "not_proven": [
+    "physical unit flash identity",
+    "flash capacity/reserved pages",
+    "heap headroom after RAM reservation",
+    "hardware state mapping",
+    "IRQ behavior on hardware",
+    "firmware update recovery",
+    "hardware operation"
+  ]
+}

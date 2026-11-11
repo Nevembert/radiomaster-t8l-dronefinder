@@ -1,0 +1,201 @@
+{
+  "status": "VERSION 1.0; SOFTWARE CHECKED; FULL HARDWARE VALIDATION PENDING",
+  "compiler": "arm-none-eabi-gcc (15:12.2.rel1-1) 12.2.1 20221205",
+  "original_sha256": "91c69ad34105bd12dc167f29cca538f84c474e18ec36902ce503b578ce03a958",
+  "module_sha256": "a6289b1cad7e0337a956fc3690a61b290093694f9962be179a67e53878ca8f8c",
+  "module_bytes": 2300,
+  "candidate_file": "T8L_v17_DroneFinder_1.0.bin",
+  "candidate_bytes": 96844,
+  "candidate_sha256": "7487229fd06aa87484c529ee938b3c2111ff8a9ca9b7af36e5073575a3ce88e6",
+  "module_start": "0x801d150",
+  "module_end": "0x801da4c",
+  "settings_start": "0x801f000",
+  "ram_reservation": [
+    "0x20002fb8",
+    "0x20003038"
+  ],
+  "ymodem_padded_end": "0x801dc00",
+  "patches": [
+    {
+      "address": "0x801743c",
+      "old": "f8f75ef9",
+      "new": "05f088fe",
+      "function": "hook_init",
+      "original_target": "0x800f6fc",
+      "target": "0x801d150"
+    },
+    {
+      "address": "0x801725e",
+      "old": "fdf723fc",
+      "new": "06f093f8",
+      "function": "hook_loop",
+      "original_target": "0x8014aa8",
+      "target": "0x801d388"
+    },
+    {
+      "address": "0x8014ba4",
+      "old": "fdf7bcf8",
+      "new": "08f06cfb",
+      "function": "hook_keys",
+      "original_target": "0x8011d20",
+      "target": "0x801d280"
+    },
+    {
+      "address": "0x80151b8",
+      "old": "02f002ff",
+      "new": "07f0ecff",
+      "function": "hook_crsf",
+      "original_target": "0x8017fc0",
+      "target": "0x801d194"
+    },
+    {
+      "address": "0x8011fe0",
+      "old": "fdf7d8fc",
+      "new": "0bf012f9",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x801387c",
+      "old": "fcf78af8",
+      "new": "09f0c4fc",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x801388e",
+      "old": "fcf781f8",
+      "new": "09f0bbfc",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x80138c4",
+      "old": "fcf766f8",
+      "new": "09f0a0fc",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x80138d6",
+      "old": "fcf75df8",
+      "new": "09f097fc",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x8013b44",
+      "old": "fbf726ff",
+      "new": "09f060fb",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x8013b56",
+      "old": "fbf71dff",
+      "new": "09f057fb",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x8013b6a",
+      "old": "fbf713ff",
+      "new": "09f04dfb",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x8013c42",
+      "old": "fbf7a7fe",
+      "new": "09f0e1fa",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x8013cce",
+      "old": "fbf761fe",
+      "new": "09f09bfa",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x8013d74",
+      "old": "fbf70efe",
+      "new": "09f048fa",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x8013e3e",
+      "old": "fbf7a9fd",
+      "new": "09f0e3f9",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x8013f9c",
+      "old": "fbf7fafc",
+      "new": "09f034f9",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x80168a0",
+      "old": "f9f778f8",
+      "new": "06f0b2fc",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x80168ca",
+      "old": "f9f763f8",
+      "new": "06f09dfc",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x80168e8",
+      "old": "f9f754f8",
+      "new": "06f08efc",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x801690c",
+      "old": "f9f742f8",
+      "new": "06f07cfc",
+      "function": "hook_leds",
+      "original_target": "0x800f994",
+      "target": "0x801d208"
+    },
+    {
+      "address": "0x801ba8c",
+      "old": "38300020",
+      "new": "b82f0020",
+      "purpose": "reserve 128 bytes inside original zero-initialized heap tail"
+    }
+  ],
+  "unvalidated": [
+    "hardware pin/order confirmation",
+    "bootloader accepts modified image and recovery without opening case",
+    "remaining heap headroom in all modes",
+    "ARM execution with original code/IRQs",
+    "ELRS CH5 disarmed convention matches user's FC setup"
+  ]
+}
