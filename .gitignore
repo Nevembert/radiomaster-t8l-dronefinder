@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+dist/
+build/module.bin
+build/module.elf
+build/module.map
